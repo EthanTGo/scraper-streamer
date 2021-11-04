@@ -1,0 +1,5 @@
+.DS_Store
+venv
+API
+config.py
+output.csv
