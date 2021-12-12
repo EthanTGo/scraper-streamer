@@ -8,6 +8,16 @@ from kafka import KafkaConsumer, KafkaProducer
 producer = KafkaProducer(bootstrap_servers='localhost:9092', value_serializer=lambda v: json.dumps(v).encode('utf-8')) 
 
 '''
+For every incoming message, we will perform the appropriate filter to remove messages that do not meet our requirements
+Here we are taking into input the value of the tweet
+'''
+def filter_tweets(tweet):
+    if not tweet['retweeted'] and 'RT @' not in tweet['text']:
+        return True
+    return False
+
+
+'''
 dict_keys(['created_at', 'id', 'id_str', 'text', 'source', 'truncated', 
 'in_reply_to_status_id', 'in_reply_to_status_id_str', 'in_reply_to_user_id', 
 'in_reply_to_user_id_str', 'in_reply_to_screen_name', 'user', 'geo', 'coordinates', 
@@ -23,15 +33,16 @@ if __name__ == '__main__':
         bootstrap_servers=['localhost:9092'],
         auto_offset_reset='latest',
         enable_auto_commit=True,
-        auto_commit_interval_ms =  5000,
+        auto_commit_interval_ms = 5000,
         fetch_max_bytes = 128,
         max_poll_records = 100,
         value_deserializer=lambda x: json.loads(x.decode('utf-8'))
     )
+
     for msg in consumer:
-        print((msg.value['text']))
-        print(nltk.word_tokenize(msg.value['text']))
-        print(type(nltk.word_tokenize(msg.value['text'])))
-        tmp = nltk.word_tokenize(msg.value['text'])
-        producer.send(cleaned_topic_name,tmp)
-        sleep(3)
+        if(filter_tweets(msg.value)):
+            tmp = nltk.word_tokenize(msg.value['text'])
+            producer.send(cleaned_topic_name,tmp)
+            print(f'Sending Data {tmp} sent to Twitter_Stream_Cleaned')
+            
+

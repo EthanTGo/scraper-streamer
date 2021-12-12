@@ -35,9 +35,16 @@ class TwitterStreamer():
         self.twitterAuth = twitterAuth()
     
     def stream_tweets(self):
+        '''
+        Parameter Explanation
+        Track = A comma-separated list of phrases which will be used to determine what Tweets will be delivered on the stream. 
+        stall_warnings = Setting this parameter to the string true will cause periodic messages to be delivered if the client is in danger of being disconnected.
+        languages= Language of choice = "English"
+        location = This represents the bounding box of Massachusetts
+        '''
         while True:
             stream = ListernerTS(TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET,TWITTER_ACCESS_TOKEN, TWITTER_ACCESS_TOKEN_SECRET)
-            stream.filter(track=['Apple'], stall_warnings=True,languages=['en'])
+            stream.filter(track=['Restaurants', 'Food', 'Dessert'], stall_warnings=True,languages=['en'], locations=[-73.508142,41.237964,-69.928393,42.886589])
 
 class ListernerTS(tweepy.Stream):
 
